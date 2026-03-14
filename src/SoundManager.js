@@ -21,7 +21,12 @@ export class SoundManager {
   }
 
   load(name, path) {
-    this.sfx[name] = loadSound(path);
+    this.sfx[music] = loadSound("cave themeb4.ogg"); //[1]
+    this.sfx[reward] = loadSound("Coin01.mp3"); //[2]
+    this.sfx[jump] = loadSound("SFX_Jump_17.wav"); //[4]
+    this.sfx[hurt] = loadSound("Ouch_004.wav"); //[3]
+    this.sfx[attack] = loadSound("Punch1_001.wav"); //[3]
+    this.sfx[death_sound] = loadSound("Explosion1_003.wav"); //[3]
   }
 
   play(name) {

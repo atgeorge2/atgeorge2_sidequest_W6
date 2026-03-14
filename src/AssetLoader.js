@@ -20,17 +20,19 @@ export async function loadAssets(levelPkg, tuningDoc) {
   // IMPORTANT:
   // loadImage() is "preload-safe" only if p5 is actually tracking it inside preload().
   // To make this robust even if your boot flow uses async/await, we wrap loadImage in a Promise.
-  const playerImg = await loadImageAsync("assets/foxSpriteSheet.png");
-  const boarImg = await loadImageAsync("assets/boarSpriteSheet.png");
-  const leafImg = await loadImageAsync("assets/leafSpriteSheet.png");
-  const fireImg = await loadImageAsync("assets/fireSpriteSheet.png");
+  const playerImg = await loadImageAsync("assets/sheet2-warriorprincess.png"); //[7]
+  const boarImg = await loadImageAsync(
+    "assets/skeleton spritesheet calciumtrice.png", //[8]
+  );
+  const leafImg = await loadImageAsync("assets/spritesheet_white.png"); //[9]
+  const fireImg = await loadImageAsync("assets/CampFire.png"); //[5]
 
-  const groundTileImg = await loadImageAsync("assets/groundTile.png");
-  const groundTileDeepImg = await loadImageAsync("assets/groundTileDeep.png");
-  const platformLCImg = await loadImageAsync("assets/platformLC.png");
-  const platformRCImg = await loadImageAsync("assets/platformRC.png");
-  const wallLImg = await loadImageAsync("assets/wallL.png");
-  const wallRImg = await loadImageAsync("assets/wallR.png");
+  const groundTileImg = await loadImageAsync("assets/CavernsGround.png"); //[6]
+  const groundTileDeepImg = await loadImageAsync("assets/CavernsDeep.png"); //[6]
+  const platformLCImg = await loadImageAsync("assets/CavernsLC.png"); //[6]
+  const platformRCImg = await loadImageAsync("assets/CavernsRC.png"); //[6]
+  const wallLImg = await loadImageAsync("assets/CavernsWallL.png"); //[6]
+  const wallRImg = await loadImageAsync("assets/CavernsWallR.png"); //[6]
 
   const fontImg = await loadImageAsync("assets/bitmapFont.png");
 
@@ -42,9 +44,13 @@ export async function loadAssets(levelPkg, tuningDoc) {
   // ---- anis ----
   // Prefer tuning-driven animations if present, else fallback to monolith defaults.
   // ALSO: inject a spriteSheet reference by default so addAnis never tries to load "undefined".
-  let playerAnis = buildAnis(tuningDoc?.player?.animations, defaultPlayerAnis(), {
-    spriteSheet: playerImg,
-  });
+  let playerAnis = buildAnis(
+    tuningDoc?.player?.animations,
+    defaultPlayerAnis(),
+    {
+      spriteSheet: playerImg,
+    },
+  );
 
   let boarAnis = buildAnis(tuningDoc?.boar?.animations, defaultBoarAnis(), {
     spriteSheet: boarImg,
@@ -101,7 +107,8 @@ export async function loadAssets(levelPkg, tuningDoc) {
  * - keeps other keys intact
  */
 function buildAnis(tuningAnis, fallbackAnis, inject = {}) {
-  const src = tuningAnis && typeof tuningAnis === "object" ? tuningAnis : fallbackAnis;
+  const src =
+    tuningAnis && typeof tuningAnis === "object" ? tuningAnis : fallbackAnis;
   const out = {};
 
   for (const [name, def] of Object.entries(src)) {
@@ -132,20 +139,20 @@ function buildAnis(tuningAnis, fallbackAnis, inject = {}) {
 // --- fallback anis (from your monolith) ---
 function defaultPlayerAnis() {
   return {
-    idle: { row: 0, frames: 4, frameDelay: 10 },
-    run: { row: 1, frames: 4, frameDelay: 3 },
-    jump: { row: 2, frames: 3, frameDelay: Infinity, frame: 0 },
-    attack: { row: 3, frames: 6, frameDelay: 2 },
-    hurtPose: { row: 5, frames: 4, frameDelay: Infinity },
-    death: { row: 5, frames: 4, frameDelay: 16 },
+    idle: { row: 2, frames: 1, frameDelay: 10 },
+    run: { row: 0, frames: 4, frameDelay: 3 },
+    jump: { row: 1, frames: 3, frameDelay: Infinity, frame: 0 },
+    attack: { row: 2, frames: 3, frameDelay: 2 },
+    hurtPose: { row: 3, frames: 4, frameDelay: 3 },
+    death: { row: 4, frames: 1, frameDelay: 16 },
   };
 }
 
 function defaultBoarAnis() {
   return {
-    run: { row: 1, frames: 4, frameDelay: 3 },
-    throwPose: { row: 4, frames: 1, frameDelay: Infinity, frame: 0 },
-    death: { row: 5, frames: 4, frameDelay: 16 },
+    run: { row: 2, frames: 10, frameDelay: 3 },
+    throwPose: { row: 3, frames: 10, frameDelay: 3 },
+    death: { row: 4, frames: 10, frameDelay: 3 },
   };
 }
 
@@ -156,17 +163,26 @@ function defaultBoarAnis() {
 function loadImageAsync(path) {
   if (!path) {
     // This is the exact scenario that led to GET /undefined.
-    throw new Error(`[AssetLoader] loadImageAsync called with invalid path: ${path}`);
+    throw new Error(
+      `[AssetLoader] loadImageAsync called with invalid path: ${path}`,
+    );
   }
   return new Promise((resolve, reject) => {
     try {
       loadImage(
         path,
         (img) => resolve(img),
-        (err) => reject(new Error(`[AssetLoader] Failed to load image "${path}": ${err}`)),
+        (err) =>
+          reject(
+            new Error(`[AssetLoader] Failed to load image "${path}": ${err}`),
+          ),
       );
     } catch (e) {
-      reject(new Error(`[AssetLoader] loadImage("${path}") threw: ${e?.message ?? e}`));
+      reject(
+        new Error(
+          `[AssetLoader] loadImage("${path}") threw: ${e?.message ?? e}`,
+        ),
+      );
     }
   });
 }
@@ -177,7 +193,7 @@ async function loadBackgrounds(levelPkg) {
   // levelPkg.parallaxLayers = [{ key:"bgFar", src:"assets/..." }, ...]
   // Your levels.json stores parallax in: level.view.parallax
   const layers = levelPkg?.level?.view?.parallax || levelPkg?.parallaxLayers;
-  
+
   if (Array.isArray(layers) && layers.length > 0) {
     const bg = {};
     for (const layer of layers) {
@@ -223,7 +239,9 @@ async function resolveAniImages(anis, label = "entity") {
     // (This makes tuning flexible and prevents p5play from trying to load "undefined".)
     if (typeof d.spriteSheet === "string") {
       if (!d.spriteSheet) {
-        throw new Error(`[AssetLoader] ${label}.${name}.spriteSheet is an empty string`);
+        throw new Error(
+          `[AssetLoader] ${label}.${name}.spriteSheet is an empty string`,
+        );
       }
       d.spriteSheet = await loadImageAsync(d.spriteSheet);
     }
@@ -294,7 +312,9 @@ function validateAssets(bundle) {
         );
       }
       if ("img" in def && (def.img === undefined || def.img === null)) {
-        throw new Error(`[AssetLoader] ${label}Anis.${name}.img is undefined/null`);
+        throw new Error(
+          `[AssetLoader] ${label}Anis.${name}.img is undefined/null`,
+        );
       }
     }
   };

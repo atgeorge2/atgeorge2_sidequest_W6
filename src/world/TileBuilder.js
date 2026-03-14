@@ -21,22 +21,30 @@ export function buildTilesAndGroups(level) {
 
   const tilemap = level.levelData?.tilemap;
   if (!Array.isArray(tilemap) || tilemap.length === 0) {
-    throw new Error(`[TileBuilder] level.levelData.tilemap is missing or empty.`);
+    throw new Error(
+      `[TileBuilder] level.levelData.tilemap is missing or empty.`,
+    );
   }
 
   const tiles = level.levelData?.tiles;
   if (!tiles || typeof tiles !== "object") {
-    throw new Error(`[TileBuilder] levels.json is missing level.tiles { tileW, tileH, frameW, frameH }.`);
+    throw new Error(
+      `[TileBuilder] levels.json is missing level.tiles { tileW, tileH, frameW, frameH }.`,
+    );
   }
 
   const tileW = Number(tiles.tileW);
   const tileH = Number(tiles.tileH);
 
   if (!Number.isFinite(tileW) || tileW <= 0) {
-    throw new Error(`[TileBuilder] Invalid tiles.tileW in levels.json: ${tiles.tileW}`);
+    throw new Error(
+      `[TileBuilder] Invalid tiles.tileW in levels.json: ${tiles.tileW}`,
+    );
   }
   if (!Number.isFinite(tileH) || tileH <= 0) {
-    throw new Error(`[TileBuilder] Invalid tiles.tileH in levels.json: ${tiles.tileH}`);
+    throw new Error(
+      `[TileBuilder] Invalid tiles.tileH in levels.json: ${tiles.tileH}`,
+    );
   }
 
   // Save for anyone who wants them later (debug/UI/etc.)
